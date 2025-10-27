@@ -1,5 +1,16 @@
 import sys
 
+mode = sys.argv[1]
+filein = sys.argv[3]
+fileout = sys.argv[4]
+
+try:
+    mult = int(sys.argv[2])
+except:
+    print("multiplier should be an integer")
+    
+    quit()
+
 
 def bytetd(array):
     
@@ -11,20 +22,20 @@ def bytetd(array):
     return delta
 
 
-if not(sys.argv[1] == 'q' or sys.argv[1] == 'a'):
+if not(mode == 'q' or mode == 'a'):
     print("first argument should be q (monochrome to colour) or a (colour to monochrome)")
     
     quit()
     
 try:
-    foxtrot_0 = open(sys.argv[2], "ab")
+    foxtrot_0 = open(filein, "ab")
 except:
     print("input file invalid")
     
     quit()
     
 try:
-    foxtrot_1 = open(sys.argv[3], "ab")
+    foxtrot_1 = open(fileout, "ab")
 except:
     print("output file invalid")
     
@@ -37,8 +48,8 @@ fsize1 = foxtrot_1.tell()
 foxtrot_0.close()
 foxtrot_1.close()
 
-foxtrot_0 = open(sys.argv[2], "rb")
-foxtrot_1 = open(sys.argv[3], "rb")
+foxtrot_0 = open(filein, "rb")
+foxtrot_1 = open(fileout, "rb")
 
 falpha0 = []
 falpha1 = []
@@ -82,7 +93,7 @@ height1 = bytetd(falpha1[22:26])
 pixstart0 = fsize0 - 3*(width0 * height0)
 pixstart1 = fsize1 - 3*(width1 * height1)
 
-foxtrot_1 = open(sys.argv[3], "wb")
+foxtrot_1 = open(fileout, "wb")
 
 index = 0
 
@@ -91,42 +102,34 @@ while index < pixstart1:
     
     index += 1
     
+i_0 = 0
+i_1 = 0
 
-i_0 = pixstart0
-i_1 = pixstart1
-    
-if sys.argv[1] == 'q':
+alpha0 = falpha0[pixstart0:fsize0]
+alpha1 = falpha1[pixstart1:fsize1]
 
-    while i_0 < fsize0 and i_0 - pixstart0 < fsize1 - pixstart1:
-        if (i_0 - pixstart0) % 3 == 2:
-            foxtrot_1.write(falpha0[i_0].to_bytes(1,"big"))
-        else:
-            foxtrot_1.write(falpha1[i_1].to_bytes(1,"big"))
+L_alpha0 = len(alpha0)
+L_alpha1 = len(alpha1)
+
+if mode == 'q':
+    while i_0 < L_alpha0:
+        alpha1[((i_1 * 3 * mult) + 2) % L_alpha1] = alpha0[i_0]
+        
+        i_0 += 3
+        i_1 += 1
+        
+if mode == 'a':
+    while i_1 < L_alpha1:
+        i_1 += 2
+        
+        alpha1[i_1] = alpha0[((i_0 * 3 * mult) + 2) % L_alpha0]
         
         i_0 += 1
         i_1 += 1
+
+for a in alpha1:
+    foxtrot_1.write(a.to_bytes(1,"big"))
         
-    if fsize1 > fsize0:
-        while i_1 < fsize1:
-            foxtrot_1.write(falpha1[i_1].to_bytes(1,"big"))
-            
-            i_1 += 1
-        
-if sys.argv[1] == 'a':
-    
-    while i_1 - pixstart1 < fsize0 - pixstart0 and i_1 - pixstart1 < fsize1 - pixstart1:
-        foxtrot_1.write(falpha0[i_0 + 2].to_bytes(1,"big"))
-        
-        if (i_1 - pixstart1) % 3 == 0 and i_0 > pixstart0:
-            i_0 += 3
-            
-        i_1 += 1
-        
-    if fsize1 > fsize0:
-        while i_1 < fsize1:
-            foxtrot_1.write(falpha1[i_1].to_bytes(1,"big"))
-        
-        i_1 += 1
         
 foxtrot_1.close()
 
