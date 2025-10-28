@@ -113,7 +113,9 @@ L_alpha1 = len(alpha1)
 
 if mode == 'q':
     while i_0 < L_alpha0:
-        alpha1[((i_1 * 3 * mult) + 2) % L_alpha1] = alpha0[i_0]
+        cycle = ((i_1 * 3 * mult) + 2) //  L_alpha1
+        
+        alpha1[(3 * ((i_1 * mult) + cycle) + 2) % L_alpha1] = alpha0[i_0]
         
         i_0 += 3
         i_1 += 1
@@ -122,11 +124,13 @@ if mode == 'a':
     while i_1 < L_alpha1:
         i_1 += 2
         
-        alpha1[i_1] = alpha0[((i_0 * 3 * mult) + 2) % L_alpha0]
+        cycle = ((i_0 * 3 * mult) + 2) // L_alpha0
+        
+        alpha1[i_1] = alpha0[(3 * ((i_0 * mult) + cycle) + 2) % L_alpha0]
         
         i_0 += 1
         i_1 += 1
-
+        
 for a in alpha1:
     foxtrot_1.write(a.to_bytes(1,"big"))
         
@@ -134,3 +138,4 @@ for a in alpha1:
 foxtrot_1.close()
 
 print("file write complete")
+
