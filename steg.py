@@ -4,6 +4,35 @@ mode = sys.argv[1]
 filein = sys.argv[3]
 fileout = sys.argv[4]
 
+key = [1]
+L_key = 1
+
+if len(sys.argv) == 6:
+    try:
+        key_path = sys.argv[5]
+        
+        key_file = open(key_path, "ab")
+        
+        L_key = key_file.tell()
+        
+        key_file.close()
+        
+        key_file = open(key_path, "rb")
+        
+        key = []
+        
+        index = 0
+        
+        while index < L_key:
+            key.append(key_file.read(1)[0])
+            
+            index += 1
+            
+    except:
+        print("invalid key file")
+        
+        quit()
+
 try:
     mult = int(sys.argv[2])
 except:
@@ -115,7 +144,7 @@ if mode == 'q':
     while i_0 < L_alpha0:
         cycle = ((i_1 * 3 * mult) + 2) //  L_alpha1
         
-        alpha1[(3 * ((i_1 * mult) + cycle) + 2) % L_alpha1] = alpha0[i_0]
+        alpha1[(3 * ((i_1 * mult * key[i_1 % L_key]) + cycle) + 2) % L_alpha1] = alpha0[i_0]
         
         i_0 += 3
         i_1 += 1
@@ -126,11 +155,11 @@ if mode == 'a':
         
         cycle = ((i_0 * 3 * mult) + 2) // L_alpha0
         
-        alpha1[i_1] = alpha0[(3 * ((i_0 * mult) + cycle) + 2) % L_alpha0]
+        alpha1[i_1] = alpha0[(3 * ((i_0 * mult * key[i_0 % L_key]) + cycle) + 2) % L_alpha0]
         
         i_0 += 1
         i_1 += 1
-        
+
 for a in alpha1:
     foxtrot_1.write(a.to_bytes(1,"big"))
         
@@ -138,4 +167,3 @@ for a in alpha1:
 foxtrot_1.close()
 
 print("file write complete")
-
